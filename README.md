@@ -2,10 +2,15 @@
 <h1>SF-Mamba</h1>
 <h3>[ICML2026] SF-Mamba: Rethinking State Space Model for Vision</h3>
 
-Homepage ([homepage](https://sony.github.io/SF-Mamba/)), arXiv Preprint ([arXiv 2411.03855](https://arxiv.org/abs/2603.16423)), ICML 2026 ([conference paper](https://openreview.net/forum?id=R9AUrEgZEq))
+Homepage ([homepage](https://sony.github.io/SF-Mamba/)), arXiv Preprint ([arXiv 2411.03855](https://arxiv.org/abs/2603.16423)), ICML 2026 ([conference paper](https://openreview.net/forum?id=R9AUrEgZEq)), 8b-is Sovereign Fork ([`8b-is/SF-Mamba`](https://github.com/8b-is/SF-Mamba))
 
 </div>
-this is the official implementation of SF-Mamba.  
+this is the official implementation of SF-Mamba, enhanced with the **8b-is Sovereign `p/q` ("Counting Divided") Harmonic Selective Scan** (`personal_lib/mmpretrain/models/backbones/sf_mamba/sf_mamba_pq.py`, aligned with [`8b-is/alexiai`](https://github.com/8b-is/alexiai) and [`8b-is/Engram`](https://github.com/8b-is/Engram)).
+
+> **8b-is Sovereign `p/q` Enhancements:**
+> 1. **Harmonic Integer-Power State Transition Recurrence ($A_n = -n$):** Because `MVModule` initializes $A_n = -n$ for $n = 1 \dots d_{\text{state}}$ (`d_state = 8`), $\bar{A}_{t,n} = \exp(-n \Delta_t) = (\exp(-\Delta_t))^n$. Using our zero-float `Q20` ($q = 2^{20}$) rational Padé `exp_neg_pq_q20` and Cayley-Padé `softplus_pq_q20`, $E_t = \exp(-\Delta_t)$ is evaluated **once per step** and $\bar{A}_{t,2..8}$ are generated via integer multiply-shifts (`(E_n * E_1) >> 20`), eliminating **87.5% (`7/8`) of exponential evaluations** while honoring batch-folding `position_indices` resets.
+> 2. **Bugfix in `BestBatchFoldingEstimator.closest_divisor` (`n_over_batch_lut.py`):** Fixes Python `%` vs `+` operator precedence in `batch_size % (int_r + d) == 0` and guards `int_r = max(1, round(r))` against `ZeroDivisionError`.
+> 3. **Offline Verification:** `python3 tests/test_sf_mamba_pq.py -v`  
 
 
 ## Setup

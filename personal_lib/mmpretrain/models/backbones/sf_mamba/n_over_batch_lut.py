@@ -26,13 +26,13 @@ class BestBatchFoldingEstimator:
 
     def closest_divisor(self, batch_size: int, r: float) -> int:
         best = batch_size
-        int_r = round(r)
+        int_r = max(1, round(r))
         for d in range(0, batch_size):
-            if batch_size % int_r+d == 0:
-                best = int_r+d
+            if (int_r + d) > 0 and batch_size % (int_r + d) == 0:
+                best = int_r + d
                 break
-            if int_r-d > 0 and batch_size % (int_r-d) == 0:
-                best = int_r-d
+            if (int_r - d) > 0 and batch_size % (int_r - d) == 0:
+                best = int_r - d
                 break
         return best
 
